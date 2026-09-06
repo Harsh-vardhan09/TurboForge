@@ -53,10 +53,10 @@ export const databasePackageJson = () => `{
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "latest"
+    "@prisma/client": "^6.1.0"
   },
   "devDependencies": {
-    "prisma": "latest",
+    "prisma": "^6.1.0",
     "@repo/typescript-config": "*",
     "typescript": "^5.0.0"
   }

@@ -70,9 +70,7 @@ export const tsConfigNode = () => `{
   "extends": "./base.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "target": "ES2020",
-    "outDir": "dist",
-    "rootDir": "src"
+    "target": "ES2020"
   }
 }
 `;
