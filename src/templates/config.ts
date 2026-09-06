@@ -1,12 +1,22 @@
-// Template literal functions for the shared config packages.
+// Template literal functions for the root files and shared config packages.
 // Each returns the full file contents as a string.
 
-export const rootPackageJson = ({ projectName }: { projectName: string }) => `{
+export const rootPackageJson = ({
+  projectName,
+  packageManager,
+}: {
+  projectName: string;
+  packageManager: "pnpm" | "npm";
+}) => {
+  // pnpm reads pnpm-workspace.yaml; npm needs the workspaces field.
+  const workspaces =
+    packageManager === "npm" ? `  "workspaces": ["apps/*", "packages/*"],\n` : "";
+
+  return `{
   "name": "${projectName}",
   "private": true,
-  "packageManager": "npm@10.9.2",
-  "workspaces": ["apps/*", "packages/*", "backend/*"],
-  "scripts": {
+  "packageManager": "${packageManager === "pnpm" ? "pnpm@9.0.0" : "npm@10.9.2"}",
+${workspaces}  "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint"
@@ -15,6 +25,12 @@ export const rootPackageJson = ({ projectName }: { projectName: string }) => `{
     "turbo": "latest"
   }
 }
+`;
+};
+
+export const pnpmWorkspaceYaml = () => `packages:
+  - "apps/*"
+  - "packages/*"
 `;
 
 export const turboJson = () => `{
@@ -33,6 +49,12 @@ export const turboJson = () => `{
     }
   }
 }
+`;
+
+// link-workspace-packages: pnpm 10+ defaults it to false, which makes the "*"
+// workspace deps resolve from the registry and 404. Without it, install fails.
+export const npmrc = () => `shamefully-hoist=true
+link-workspace-packages=true
 `;
 
 // --- packages/typescript-config ---
@@ -65,6 +87,7 @@ export const tsConfigNextjs = () => `{
 }
 `;
 
+// Kept: apps/server's tsconfig (backendTsConfig in apps.ts) extends node.json.
 export const tsConfigNode = () => `{
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./base.json",
