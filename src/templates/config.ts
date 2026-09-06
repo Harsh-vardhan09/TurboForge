@@ -87,6 +87,19 @@ export const tsConfigNextjs = () => `{
 }
 `;
 
+export const tsConfigReactLibrary = () => `{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2015", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES6"
+  }
+}
+`;
+
 // Kept: apps/server's tsconfig (backendTsConfig in apps.ts) extends node.json.
 export const tsConfigNode = () => `{
   "$schema": "https://json.schemastore.org/tsconfig",
@@ -139,6 +152,53 @@ export const tailwindPackageJson = () => `{
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
+  }
+}
+`;
+
+// --- packages/eslint-config ---
+
+export const eslintConfigBase = () => `/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  extends: ["eslint:recommended"],
+  env: {
+    node: true,
+    es2022: true,
+  },
+  parserOptions: {
+    ecmaVersion: "latest",
+    sourceType: "module",
+  },
+  rules: {
+    "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "no-console": "off",
+  },
+};
+`;
+
+export const eslintConfigNext = () => `/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  extends: [
+    "./base.js",
+    "next/core-web-vitals",
+  ],
+  rules: {
+    "@next/next/no-html-link-for-pages": "off",
+  },
+};
+`;
+
+export const eslintConfigPackageJson = () => `{
+  "name": "@repo/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "base.js",
+  "exports": {
+    "./base": "./base.js",
+    "./next": "./next.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"
   }
 }
 `;
@@ -262,10 +322,7 @@ export const uiPackageJson = () => `{
 `;
 
 export const uiTsConfig = () => `{
-  "extends": "@repo/typescript-config/nextjs.json",
-  "compilerOptions": {
-    "jsx": "react-jsx"
-  },
+  "extends": "@repo/typescript-config/react-library.json",
   "include": ["src"]
 }
 `;
