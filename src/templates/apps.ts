@@ -1,4 +1,4 @@
-// Template literal functions for the database package, backend API, and Next.js app.
+// Template literal functions for the database package, the server app, and the web app.
 // Each returns the full file contents as a string.
 
 // --- packages/database ---
@@ -21,29 +21,45 @@ model User {
 }
 `;
 
-export const databaseIndex = () => `import { PrismaClient } from "@prisma/client";
+export const databaseClient = () => `import { PrismaClient } from "@prisma/client";
 
-// Next.js re-evaluates modules on every HMR reload, so a plain \`new PrismaClient()\`
-// leaks a connection pool per edit. Stash one instance on globalThis in dev.
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
+`;
 
-export { PrismaClient };
+export const databaseIndex = () => `export { prisma } from "./client";
+export { PrismaClient } from "@prisma/client";
 export * from "@prisma/client";
 `;
 
+// main/types: apps/server compiles with module CommonJS and no moduleResolution,
+// so TypeScript uses Node10 resolution — which ignores the exports map.
+// Prisma pinned, not "latest": latest resolves the CLI to an 8.x rc against
+// @prisma/client 7.x, and the mismatched CLI has no `generate` command.
 export const databasePackageJson = () => `{
   "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./src/index.ts"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
     }
   },
   "scripts": {
@@ -69,49 +85,88 @@ export const databaseTsConfig = () => `{
 }
 `;
 
-// --- backend/api ---
+// --- apps/server ---
 
-export const backendIndex = () => `import express from "express";
+export const serverIndex = () => `import express from "express";
 import cors from "cors";
 import { healthRouter } from "./routes/health";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
+const PORT = process.env.PORT ?? 4000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Routes
 app.use("/health", healthRouter);
 
+// Error handler — must be last
 app.use(errorHandler);
 
-const port = process.env.PORT ?? 4000;
-
-app.listen(port, () => {
-  console.log("api listening on http://localhost:" + port);
+app.listen(PORT, () => {
+  console.log(\`Server running on http://localhost:\${PORT}\`);
 });
+
+export default app;
 `;
 
-export const backendHealth = () => `import { Router } from "express";
-
-export const healthRouter = Router();
-
-healthRouter.get("/", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
+export const serverDbConfig = () => `export { prisma } from "@repo/database";
 `;
 
-export const backendErrorHandler = () => `import type { ErrorRequestHandler } from "express";
+export const serverHealthController = () => `import type { Request, Response } from "express";
 
-// Four args is what marks this as an error handler to Express — do not trim \`next\`.
-export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: err.message });
+export const getHealth = (_req: Request, res: Response) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
 };
 `;
 
-export const backendPackageJson = () => `{
-  "name": "api",
+export const serverHealthRoute = () => `import { Router } from "express";
+import { getHealth } from "../controllers/healthController";
+
+export const healthRouter = Router();
+
+healthRouter.get("/", getHealth);
+`;
+
+export const serverAuthMiddleware = () => `import type { Request, Response, NextFunction } from "express";
+
+export interface AuthRequest extends Request {
+  userId?: string;
+}
+
+export const authMiddleware = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    res.status(401).json({ error: "Unauthorised" });
+    return;
+  }
+
+  // TODO: verify JWT here
+  next();
+};
+`;
+
+export const serverErrorHandler = () => `import type { ErrorRequestHandler } from "express";
+
+export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: err.message ?? "Internal server error" });
+};
+`;
+
+export const serverPackageJson = () => `{
+  "name": "server",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -130,14 +185,17 @@ export const backendPackageJson = () => `{
     "@types/node": "^20.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.0",
-    "@repo/typescript-config": "*"
+    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "*"
   }
 }
 `;
 
-export const backendTsConfig = () => `{
-  "extends": "@repo/typescript-config/node.json",
+export const serverTsConfig = () => `{
+  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2020",
     "outDir": "dist",
     "rootDir": "src"
   },
