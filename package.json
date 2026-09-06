@@ -6,6 +6,12 @@
   "bin": {
     "create-turbo-stack": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
@@ -21,5 +27,17 @@
     "typescript": "^5.0.0",
     "@types/node": "^20.0.0",
     "@types/fs-extra": "^11.0.0"
+  },
+  "keywords": [
+    "turborepo",
+    "monorepo",
+    "next",
+    "prisma",
+    "express",
+    "tailwind"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/create-turbo-stack"
   }
 }
