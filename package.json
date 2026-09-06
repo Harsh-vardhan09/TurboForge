@@ -1,0 +1,25 @@
+{
+  "name": "create-turbo-stack",
+  "version": "1.0.0",
+  "description": "Scaffold a production Turborepo monorepo",
+  "type": "module",
+  "bin": {
+    "create-turbo-stack": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "dev": "tsup src/index.ts --format esm --watch"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "fs-extra": "^11.2.0",
+    "picocolors": "^1.0.0",
+    "execa": "^9.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/fs-extra": "^11.0.0"
+  }
+}
