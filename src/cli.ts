@@ -2,14 +2,17 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { scaffold } from "./scaffold.js";
 
+// Replaced at build time by tsup's define (see tsup.config.ts).
+declare const __VERSION__: string;
+
 const NAME_RE = /^[a-z0-9-]+$/;
 const DB_RE = /^[a-z0-9_]+$/;
 
 const HELP = `
-  ${pc.bold("create-turbo-stack")} — scaffold a production Turborepo monorepo
+  ${pc.bold("turboforge")} — scaffold a production Turborepo monorepo
 
   ${pc.bold("Usage")}
-    npx create-turbo-stack [project-name]
+    npx turboforge [project-name]
 
   ${pc.bold("Options")}
     -h, --help       show this message
@@ -34,7 +37,7 @@ export async function run() {
     return;
   }
   if (arg === "-v" || arg === "--version") {
-    console.log("1.0.0");
+    console.log(__VERSION__);
     return;
   }
   // Anything else flag-shaped is a typo, not a project name — don't scaffold `--nope/`.
@@ -45,7 +48,7 @@ export async function run() {
     process.exit(1);
   }
 
-  p.intro(pc.bgCyan(pc.black(" create-turbo-stack ")));
+  p.intro(pc.bgCyan(pc.black(" turboforge ")));
 
   const projectName =
     arg ??

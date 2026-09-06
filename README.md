@@ -1,11 +1,11 @@
-# create-turbo-stack
+# turboforge
 
 One command to scaffold a production-ready Turborepo monorepo.
 
 ## Usage
 
 ```bash
-npx create-turbo-stack my-app
+npx turboforge my-app
 ```
 
 ## Stack

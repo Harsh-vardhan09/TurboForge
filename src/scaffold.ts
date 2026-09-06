@@ -168,7 +168,7 @@ export async function scaffold({ projectName, dbName, packageManager }: Opts) {
   try {
     await run("git", ["init"]);
     await run("git", ["add", "."]);
-    await run("git", ["commit", "-m", "init: scaffold from create-turbo-stack"]);
+    await run("git", ["commit", "-m", "init: scaffold from turboforge"]);
     s.stop("Git repository initialized");
   } catch {
     // no git, or no configured user.name/user.email — files are written either way

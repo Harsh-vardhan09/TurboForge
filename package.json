@@ -1,10 +1,10 @@
 {
-  "name": "create-turbo-stack",
+  "name": "turboforge",
   "version": "1.0.0",
   "description": "Scaffold a production Turborepo monorepo",
   "type": "module",
   "bin": {
-    "create-turbo-stack": "./dist/index.js"
+    "turboforge": "./dist/index.js"
   },
   "files": [
     "dist"
@@ -14,7 +14,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0",
@@ -38,6 +39,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/create-turbo-stack"
+    "url": "https://github.com/Harsh-vardhan09/Turborepo-Scaffold-Template"
   }
 }
