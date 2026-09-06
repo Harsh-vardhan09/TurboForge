@@ -284,6 +284,8 @@ export const webPackageJson = ({ projectName: _projectName }: { projectName: str
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@repo/tailwind-config": "*",
+    "@repo/eslint-config": "*",
+    "eslint": "^8.0.0",
     "tailwindcss": "^3.4.0",
     "autoprefixer": "^10.0.0",
     "postcss": "^8.0.0",
@@ -309,6 +311,12 @@ const nextConfig = {
 };
 
 export default nextConfig;
+`;
+
+export const webEslintConfig = () => `/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  extends: ["@repo/eslint-config/next"],
+};
 `;
 
 // --- root ---
