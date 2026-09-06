@@ -65,6 +65,16 @@ export async function run() {
     }),
   );
 
+  const packageManager = bail(
+    await p.select({
+      message: "Package manager?",
+      options: [
+        { value: "pnpm", label: "pnpm (recommended)" },
+        { value: "npm", label: "npm" },
+      ],
+    }),
+  ) as "pnpm" | "npm";
+
   const ok = bail(
     await p.confirm({ message: `Create ${projectName} with database ${dbName}?` }),
   );
@@ -73,5 +83,5 @@ export async function run() {
     process.exit(0);
   }
 
-  await scaffold({ projectName, dbName });
+  await scaffold({ projectName, dbName, packageManager });
 }
