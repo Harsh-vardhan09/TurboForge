@@ -15,7 +15,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "tsup test/projectDir.test.ts --no-config --format esm --platform node --target node18 --out-dir .test-dist --no-dts --clean && node .test-dist/projectDir.test.js"
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0",
