@@ -4,6 +4,8 @@ import { execa } from "execa";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 
+import { inspectProjectDir } from "./projectDir.js";
+
 import {
   rootPackageJson,
   pnpmWorkspaceYaml,
@@ -66,7 +68,12 @@ const POSTCSS_CONFIG = "export default { plugins: { tailwindcss: {}, autoprefixe
 export async function scaffold({ projectName, dbName, packageManager }: Opts) {
   const projectDir = path.resolve(process.cwd(), projectName);
 
-  if ((await fs.pathExists(projectDir)) && (await fs.readdir(projectDir)).length > 0) {
+  const projectDirState = await inspectProjectDir(projectDir);
+  if (projectDirState === "non-directory") {
+    p.cancel(`${pc.red(projectDir)} already exists and is not a directory.`);
+    process.exit(1);
+  }
+  if (projectDirState === "non-empty-directory") {
     p.cancel(`${pc.red(projectDir)} already exists and is not empty.`);
     process.exit(1);
   }
